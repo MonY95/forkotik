@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для котика</title>
+    <!-- Подключение шрифтов с Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Comic+Neue:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Roboto', 'Arial', 'Helvetica', sans-serif;
+            background-color: #f9f9f9;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Стили для первой страницы */
+        .page-1 {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .page-1 .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #FF69B4;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .page-1 .button:hover {
+            background-color: #FF1493;
+        }
+
+        .page-1 .heart {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 105, 180, 0.6);
+            transform: rotate(-45deg);
+            animation: float 5s linear infinite;
+        }
+
+        .page-1 .heart::before,
+        .page-1 .heart::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 105, 180, 0.6);
+            border-radius: 50%;
+        }
+
+        .page-1 .heart::before {
+            top: -50px;
+            left: 0;
+        }
+
+        .page-1 .heart::after {
+            left: 50px;
+            top: 0;
+        }
+
+        .page-1 .top-left,
+        .page-1 .bottom-right {
+            position: absolute;
+            width: 300px;
+            height: auto;
+            z-index: 0;
+        }
+
+        .page-1 .top-left {
+            top: 10px;
+            left: 10px;
+        }
+
+        .page-1 .bottom-right {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        /* Стили для второй страницы */
+        .page-2 {
+            display: none; /* Скрываем по умолчанию */
+            text-align: center;
+        }
+
+        .page-2 .envelope {
+            position: relative;
+            width: 200px;
+            height: 120px;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: sway 2s infinite ease-in-out;
+        }
+
+        .page-2 .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-top: 60px solid white;
+            filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .page-2 .envelope::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 100px solid #f0f0f0;
+            border-right: 100px solid #f0f0f0;
+            border-bottom: 60px solid transparent;
+        }
+
+        .page-2 .envelope .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: white;
+            transform-origin: top;
+            transition: transform 0.3s ease;
+            z-index: 3;
+        }
+
+        .page-2 .envelope .flap::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-top: 60px solid white;
+        }
+
+        .page-2 .envelope.open .flap {
+            transform: rotateX(180deg);
+        }
+
+        .page-2 .note {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 220px;
+            padding: 20px;
+            background-color: #fff5e1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            font-size: 18px;
+            font-family: 'Pacifico', cursive;
+            color: #ff6b6b;
+            border-radius: 10px;
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            z-index: 2;
+        }
+
+        .page-2 .note.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .page-2 .note::before {
+            content: '💌';
+            font-size: 24px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .page-2 .note::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid #fff5e1;
+        }
+
+        .page-2 .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .page-2 .heart-effect {
+            position: absolute;
+            font-size: 24px;
+            color: #ff6b6b;
+            animation: float 5s infinite ease-in-out;
+        }
+
+        .page-2 .more-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #ff6b6b;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 3;
+        }
+
+        .page-2 .more-button.show {
+            opacity: 1;
+        }
+
+        .page-2 .photo-left,
+        .page-2 .photo-right {
+            position: absolute;
+            width: 300px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .page-2 .photo-left {
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+        }
+
+        .page-2 .photo-right {
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+        }
+
+        .page-2 .instruction {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-family: 'Pacifico', cursive;
+            color: #ff6b6b;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .page-2 .instruction::after {
+            content: '👇';
+            display: block;
+            font-size: 32px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* Стили для третьей страницы */
+        .page-3 {
+            display: none; /* Скрываем по умолчанию */
+            text-align: center;
+        }
+
+        .page-3 .valentine-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            z-index: 2;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .page-3 .valentine-card h1 {
+            font-size: 36px;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+
+        .page-3 .valentine-card p {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .page-3 .valentine-card::before {
+            content: '💌';
+            font-size: 60px;
+            display: block;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        .page-3 .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .page-3 .heart-effect {
+            position: absolute;
+            font-size: 24px;
+            color: #ff6b6b;
+            animation: float 5s infinite ease-in-out;
+        }
+
+        .page-3 .lily-left,
+        .page-3 .lily-right {
+            position: absolute;
+            width: 375px;
+            height: auto;
+            z-index: 1;
+            animation: sway 3s infinite ease-in-out;
+        }
+
+        .page-3 .lily-left {
+            top: -50px;
+            left: -100px;
+            transform: rotate(-15deg);
+        }
+
+        .page-3 .lily-right {
+            bottom: -50px;
+            right: -100px;
+            transform: rotate(15deg);
+        }
+
+        .page-3 .arrow {
+            position: absolute;
+            font-size: 24px;
+            color: #ff6b6b;
+            font-family: 'Pacifico', cursive;
+            z-index: 2;
+        }
+
+        .page-3 .arrow-left {
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%) rotate(-10deg);
+        }
+
+        .page-3 .arrow-right {
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%) rotate(10deg);
+        }
+
+        .page-3 .arrow::before {
+            content: '👉 you';
+            font-size: 24px;
+        }
+
+        /* Общие анимации */
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes sway {
+            0%, 100% {
+                transform: rotate(-2deg);
+            }
+            50% {
+                transform: rotate(2deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Первая страница -->
+    <div class="page-1">
+        <div class="container">
+            <h1>Для котика</h1>
+            <button class="button" onclick="showPage(2)">нажми<3</button>
+        </div>
+        <img src="1.png" alt="Image 1" class="top-left">
+        <img src="2.png" alt="Image 2" class="bottom-right">
+        <div class="heart" style="left: 20%; animation-duration: 3s;"></div>
+        <div class="heart" style="left: 40%; animation-duration: 4s;"></div>
+        <div class="heart" style="left: 60%; animation-duration: 5s;"></div>
+        <div class="heart" style="left: 80%; animation-duration: 6s;"></div>
+    </div>
+
+    <!-- Вторая страница -->
+    <div class="page-2">
+        <div class="instruction">Тык сюда</div>
+        <div class="envelope" onclick="openEnvelope()">
+            <div class="flap"></div>
+            <div class="heart">💖</div>
+        </div>
+        <div class="note" id="note">
+            Ты самая милая! 💖
+            <br>
+            Спасибо, что ты есть! 🌸
+        </div>
+        <button class="more-button" id="moreButton" onclick="showPage(3)">еще..</button>
+        <img src="rr.jpg" alt="Фото 1" class="photo-left">
+        <img src="q.gif" alt="Фото 2" class="photo-right">
+        <div class="hearts" id="hearts"></div>
+    </div>
+
+    <!-- Третья страница -->
+    <div class="page-3">
+        <div class="valentine-card">
+            <h1>Для котика💖</h1>
+            <p>
+                Ты — самое прекрасное, что есть в моей жизни!<br>
+                Спасибо за твою улыбку, тепло и любовь!<br>
+                Я счастлив, что ты рядом! 🌸
+            </p>
+        </div>
+        <img src="123.gif" alt="Лилия" class="lily-left">
+        <img src="222.gif" alt="Лилия" class="lily-right">
+        <div class="arrow arrow-left"></div>
+        <div class="arrow arrow-right"></div>
+        <div class="hearts" id="hearts-page3"></div>
+    </div>
+
+    <script>
+        // Функция для переключения страниц
+        function showPage(pageNumber) {
+            document.querySelector('.page-1').style.display = 'none';
+            document.querySelector('.page-2').style.display = 'none';
+            document.querySelector('.page-3').style.display = 'none';
+            document.querySelector(`.page-${pageNumber}`).style.display = 'block';
+        }
+
+        // Показываем первую страницу по умолчанию
+        showPage(1);
+
+        // Логика для второй страницы
+        function openEnvelope() {
+            const envelope = document.querySelector('.page-2 .envelope');
+            const note = document.querySelector('.page-2 #note');
+            const hearts = document.querySelector('.page-2 #hearts');
+            const moreButton = document.querySelector('.page-2 #moreButton');
+
+            envelope.classList.add('open');
+            note.classList.add('show');
+            moreButton.classList.add('show');
+
+            // Добавляем сердечки
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart-effect');
+                heart.innerHTML = '💖';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                hearts.appendChild(heart);
+
+                // Удаляем сердечко после завершения анимации
+                heart.addEventListener('animationend', () => {
+                    heart.remove();
+                });
+            }
+        }
+
+        // Логика для третьей страницы
+        const heartsPage3 = document.querySelector('.page-3 #hearts-page3');
+        for (let i = 0; i < 20; i++) {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-effect');
+            heart.innerHTML = '💖';
+            heart.style.left = `${Math.random() * 100}%`;
+            heart.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            heartsPage3.appendChild(heart);
+
+            // Удаляем сердечко после завершения анимации
+            heart.addEventListener('animationend', () => {
+                heart.remove();
+            });
+        }
+    </script>
+</body>
+</html>
